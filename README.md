@@ -1,2 +1,2 @@
-# printf
-collaborative project about printf function(s)
+THIS DIRECTORY HOLDS THE PRINTF FUNCTION
+Creating a printf function
