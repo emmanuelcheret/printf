@@ -1,34 +1,49 @@
 #include "main.h"
 
 /**
- * _printf - implementat the inbuilt printf
- * @format: format specifier
- * Return: formated string
+ * _printf - prints anything
+ * @format: the format string
+ *
+ * Return: number of bytes printed
  */
-
 int _printf(const char *format, ...)
 {
-	int printed = 0;
+	int sum = 0;
+	va_list ap;
+	char *p, *start;
+	params_t params = PARAMS_INIT;
 
-	va_list args;
+	va_start(ap, format);
 
-	va_start(args, format);
-
-	while (*format != '\0')
+	if (!format || (format[0] == '%' && !format[1]))
+		return (-1);
+	if (format[0] == '%' && format[1] == ' ' && !format[2])
+		return (-1);
+	for (p = (char *)format; *p; p++)
 	{
-		if (*format == '%')
+		init_params(&params, ap);
+		if (*p != '%')
 		{
-			format++;
-			printed = selector(format, args, printed);
-			format++;
+			sum += _putchar(*p);
+			continue;
 		}
+		start = p;
+		p++;
+		while (get_flag(p, &params)) /* while char at p is flag char */
+		{
+			p++; /* next char */
+		}
+		p = get_width(p, &params, ap);
+		p = get_precision(p, &params, ap);
+		if (get_modifier(p, &params))
+			p++;
+		if (!get_specifier(p))
+			sum += print_from_to(start, p,
+				params.l_modifier || params.h_modifier ? p - 1 : 0);
 		else
-		{
-			_putchar(*format);
-			printed++;
-			format++;
-		}
+			sum += get_print_func(p, ap, &params);
 	}
-	va_end(args);
-	return (printed);
+	_putchar(BUF_FLUSH);
+	va_end(ap);
+	return (sum);
 }
